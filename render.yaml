@@ -3,7 +3,7 @@ services:
     name: pterostats-bot
     env: node
     buildCommand: npm install
-    startCommand: node index.js
+    startCommand: npm start
     plan: free
     envVars:
       - key: NODE_ENV
@@ -16,10 +16,6 @@ services:
         fromGroup: pterostats-secrets
       - key: CHANNEL_ID
         fromGroup: pterostats-secrets
-      - key: INTERVAL
-        value: "300000"
-      - key: LOG_ERROR
-        value: "true"
 
 envVarGroups:
   - name: pterostats-secrets
