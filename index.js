@@ -53,21 +53,21 @@ async function fetchPanelStats() {
         };
 
         // Fetch servers
-        const serversResponse = await axios.get(`${config.panelUrl}/api/application/servers`, { headers });
+        const serversResponse = await axios.get(`${config.panelUrl}/api/client`, { headers });
         const servers = serversResponse.data.data;
 
         // Fetch users
-        const usersResponse = await axios.get(`${config.panelUrl}/api/application/users`, { headers });
-        const users = usersResponse.data.data;
+      //  const usersResponse = await axios.get(`${config.panelUrl}/api/application/users`, { headers });
+       // const users = usersResponse.data.data;
 
         // Fetch nodes
-        const nodesResponse = await axios.get(`${config.panelUrl}/api/application/nodes`, { headers });
-        const nodes = nodesResponse.data.data;
+       // const nodesResponse = await axios.get(`${config.panelUrl}/api/application/nodes`, { headers });
+      //  const nodes = nodesResponse.data.data;
 
         // Calculate statistics
         const totalServers = servers.length;
-        const totalUsers = users.length;
-        const totalNodes = nodes.length;
+     //   const totalUsers = users.length;
+    //    const totalNodes = nodes.length;
 
         // Count running servers (this requires additional API calls to get server status)
         let runningServers = 0;
