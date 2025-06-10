@@ -6,7 +6,6 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Health check endpoint for Render
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
@@ -52,36 +51,21 @@ async function fetchPanelStats() {
             'Accept': 'application/json'
         };
 
-        // Fetch servers
+        // Fetch servers using client API
         const serversResponse = await axios.get(`${config.panelUrl}/api/client`, { headers });
         const servers = serversResponse.data.data;
 
-        // Fetch users
-      //  const usersResponse = await axios.get(`${config.panelUrl}/api/application/users`, { headers });
-       // const users = usersResponse.data.data;
-
-        // Fetch nodes
-       // const nodesResponse = await axios.get(`${config.panelUrl}/api/application/nodes`, { headers });
-      //  const nodes = nodesResponse.data.data;
-
-        // Calculate statistics
         const totalServers = servers.length;
-        const totalUsers = null;
-        const totalNodes = null;
+        const totalUsers = null; // Not available in client API
+        const totalNodes = null; // Not available in client API
 
-        // Count running servers (this requires additional API calls to get server status)
+        // Count running servers (limited to first 10)
         let runningServers = 0;
-        for (const server of servers.slice(0, 10)) { // Limit to first 10 to avoid rate limits
+        for (const server of servers.slice(0, 10)) {
             try {
                 const statusResponse = await axios.get(
                     `${config.panelUrl}/api/client/servers/${server.attributes.identifier}/resources`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${config.apiKey}`,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        }
-                    }
+                    { headers }
                 );
                 if (statusResponse.data.attributes.current_state === 'running') {
                     runningServers++;
@@ -111,10 +95,10 @@ function createStatsEmbed(stats) {
         .setTitle(`📊 ${config.panelName} Statistics`)
         .setColor('#0099ff')
         .addFields(
-            { name: '🖥️ Total Servers', value: stats.totalServers.toString(), inline: true },
-            { name: '▶️ Running Servers', value: stats.runningServers.toString(), inline: true },
-            { name: '👥 Total Users', value: stats.totalUsers.toString(), inline: true },
-            { name: '🌐 Total Nodes', value: stats.totalNodes.toString(), inline: true }
+            { name: '🖥️ Total Servers', value: stats.totalServers?.toString() ?? 'N/A', inline: true },
+            { name: '▶️ Running Servers', value: stats.runningServers?.toString() ?? 'N/A', inline: true },
+            { name: '👥 Total Users', value: stats.totalUsers?.toString() ?? 'N/A', inline: true },
+            { name: '🌐 Total Nodes', value: stats.totalNodes?.toString() ?? 'N/A', inline: true }
         )
         .setTimestamp(stats.timestamp)
         .setFooter({ text: 'PteroStats - Auto Updated' });
@@ -122,7 +106,7 @@ function createStatsEmbed(stats) {
     return embed;
 }
 
-// Function to update statistics
+// Function to update statistics in Discord
 async function updateStats() {
     try {
         console.log('Fetching panel statistics...');
@@ -135,7 +119,7 @@ async function updateStats() {
             return;
         }
 
-        // Try to edit the last message if it exists, otherwise send a new one
+        // Edit last message if it exists and was sent by bot
         const messages = await channel.messages.fetch({ limit: 1 });
         const lastMessage = messages.first();
 
@@ -152,23 +136,19 @@ async function updateStats() {
     }
 }
 
-// Bot events
+// Discord bot events
 client.once('ready', () => {
     console.log(`✅ ${client.user.tag} is now online!`);
     console.log(`📊 Monitoring panel: ${config.panelName}`);
     console.log(`🔄 Update interval: ${config.updateInterval / 1000} seconds`);
-    
-    // Send initial stats
-    updateStats();
-    
-    // Set up periodic updates
-    setInterval(updateStats, config.updateInterval);
+
+    updateStats(); // Initial run
+    setInterval(updateStats, config.updateInterval); // Schedule repeats
 });
 
+// Manual command (!stats)
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
-    
-    // Manual update command
     if (message.content.toLowerCase() === '!stats' && message.channel.id === config.channelId) {
         await updateStats();
     }
