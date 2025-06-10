@@ -66,8 +66,8 @@ async function fetchPanelStats() {
 
         // Calculate statistics
         const totalServers = servers.length;
-     //   const totalUsers = users.length;
-    //    const totalNodes = nodes.length;
+        const totalUsers = null;
+        const totalNodes = null;
 
         // Count running servers (this requires additional API calls to get server status)
         let runningServers = 0;
