@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: pterostats-bot
+    env: node
+    buildCommand: npm install
+    startCommand: node index.js
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DISCORD_TOKEN
+        fromGroup: pterostats-secrets
+      - key: PANEL_URL
+        fromGroup: pterostats-secrets
+      - key: PANEL_API_KEY
+        fromGroup: pterostats-secrets
+      - key: CHANNEL_ID
+        fromGroup: pterostats-secrets
+      - key: INTERVAL
+        value: "300000"
+      - key: LOG_ERROR
+        value: "true"
+
+envVarGroups:
+  - name: pterostats-secrets
