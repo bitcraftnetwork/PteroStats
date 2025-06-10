@@ -13,7 +13,7 @@
       "plan": "free",
       "env": "node",
       "buildCommand": "npm install",
-      "startCommand": "npm start",
+      "startCommand": "node index.js",
       "healthCheckPath": "/health",
       "envVars": [
         {
@@ -39,6 +39,10 @@
         {
           "key": "PANEL_NAME",
           "value": "My Panel"
+        },
+        {
+          "key": "UPDATE_INTERVAL",
+          "value": "300000"
         },
         {
           "key": "PORT",
