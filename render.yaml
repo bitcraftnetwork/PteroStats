@@ -1,21 +1,50 @@
-services:
-  - type: worker
-    name: pterostats-bot
-    env: node
-    buildCommand: npm install
-    startCommand: npm start
-    plan: free
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: DISCORD_TOKEN
-        fromGroup: pterostats-secrets
-      - key: PANEL_URL
-        fromGroup: pterostats-secrets
-      - key: PANEL_API_KEY
-        fromGroup: pterostats-secrets
-      - key: CHANNEL_ID
-        fromGroup: pterostats-secrets
-
-envVarGroups:
-  - name: pterostats-secrets
+{
+  "name": "render.json",
+  "build": {
+    "env": {
+      "NODE_VERSION": "18.x"
+    },
+    "buildCommand": "npm install"
+  },
+  "services": [
+    {
+      "type": "web",
+      "name": "pterostats-bot",
+      "plan": "free",
+      "env": "node",
+      "buildCommand": "npm install",
+      "startCommand": "npm start",
+      "healthCheckPath": "/health",
+      "envVars": [
+        {
+          "key": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "key": "DISCORD_TOKEN",
+          "sync": false
+        },
+        {
+          "key": "PANEL_URL",
+          "sync": false
+        },
+        {
+          "key": "PANEL_API_KEY",
+          "sync": false
+        },
+        {
+          "key": "CHANNEL_ID",
+          "sync": false
+        },
+        {
+          "key": "PANEL_NAME",
+          "value": "My Panel"
+        },
+        {
+          "key": "PORT",
+          "value": "3000"
+        }
+      ]
+    }
+  ]
+}
